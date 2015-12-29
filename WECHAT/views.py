@@ -1,13 +1,17 @@
 # -*- coding: utf-8 -*-
 from django.http import HttpResponse
 import hashlib
+from wechat_sdk import WechatBasic
 import time
 import os
-import urllib2,json
+#import urllib2,json
 # from lxml import etree
 import xml.dom.minidom
 from django.views.generic.base import View
 from django.shortcuts import render
+
+wechat = WechatBasic(token='breadmum')
+
 class WeixinInterfaceView(View):
     def get(self, request):
         #得到GET内容
@@ -48,12 +52,19 @@ class WeixinInterfaceView(View):
         content = collection.getElementsByTagName("Content")[0].childNodes[0].data
         msgId = collection.getElementsByTagName("MsgId")[0].childNodes[0].data
 
-        return render(request, 'reply_text.xml',
-                      {'toUserName': fromUserName,
-                       'fromUserName': toUserName,
-                       'createTime': time.time(),
-                       'msgType': msgType,
-                       'content': content,
-                       },
-                       content_type = 'application/xml'
-        )
+        # return render(request, 'reply_text.xml',
+        #               {'toUserName': fromUserName,
+        #                'fromUserName': toUserName,
+        #                'createTime': time.time(),
+        #                'msgType': msgType,
+        #                'content': content + ' - by server',
+        #                },
+        #                content_type = 'application/xml'
+        # )
+
+        recipe_list = []
+        recipe1 = {'title': '圣诞糖霜饼干','description': '圣诞糖霜饼干（圣诞节的必备下午茶）——附圣诞树、圣诞袜及雪花','picurl': 'http://cp2.douguo.net/upload/caiku/a/0/c/yuan_a02da6fd93bef5ec78b9f97d4412bb6c.jpg','url': 'http://www.douguo.com/cookbook/1309300.html'}
+        recipe_list.append(recipe1)
+        response = wechat.response_news(recipe_list)
+
+        return response
